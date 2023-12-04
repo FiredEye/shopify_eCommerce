@@ -15,7 +15,7 @@ const CardUi = ({ product }) => {
   const nav = useNavigate();
   return (
     <Card
-      className="mt-6 w-full cursor-pointer hover:shadow-2xl !max-w-[300px]"
+      className="mb-[20px] flex flex-col gap-[14px] cursor-pointer rounded-lg hover:shadow-gray-600 hover:shadow-lg bg-gray-900  text-gray-400"
       onClick={() => nav(`/productDetail/${product._id}`)}
     >
       <CardHeader color="blue-gray" className="relative h-56 ">
@@ -33,23 +33,24 @@ const CardUi = ({ product }) => {
         />
       </CardHeader>
       <CardBody>
-        <Typography variant="h5" color="blue-gray" className="mb-2">
+        <Typography variant="h5" className="mb-2">
           {product.product_name}
         </Typography>
-        <Typography>
+        <Typography className="h-[60px]">
           {product.product_detail.substring(0, 100) + "...."}
         </Typography>
-        {product.numReviews > 0 && (
-          <div>
-            <div className="flex justify-between">
-              <Rating value={product.rating} readonly />
-              <h1> Reviews: {product.numReviews}</h1>
-            </div>
+
+        <div>
+          <div className="flex justify-between">
+            <Rating value={product.rating} readonly />
+            <h1> Reviews: {product.numReviews}</h1>
           </div>
-        )}
+        </div>
       </CardBody>
       <CardFooter className="pt-0">
-        <Button>Read More</Button>
+        <Button className="border border-gray-500 text-gray-400 hover:bg-gray-400 hover:text-gray-900 transition-all">
+          Read More
+        </Button>
       </CardFooter>
     </Card>
   );

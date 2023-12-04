@@ -42,7 +42,7 @@ const Login = () => {
       shadow={false}
       className="mx-auto max-w-xl mt-12 space-y-9"
     >
-      <Typography variant="h4" color="blue-gray">
+      <Typography variant="h4" className="text-white">
         Login Form
       </Typography>
 
@@ -52,8 +52,10 @@ const Login = () => {
             name="email"
             onChange={formik.handleChange}
             value={formik.values.email}
+            color="white"
             size="lg"
             label="Email"
+            autoComplete="off"
           />
 
           {formik.errors.email && formik.touched.email && (
@@ -64,6 +66,7 @@ const Login = () => {
             name="password"
             onChange={formik.handleChange}
             value={formik.values.password}
+            color="white"
             type="password"
             size="lg"
             label="Password"
@@ -78,12 +81,12 @@ const Login = () => {
             <div className="h-7 w-7 border-2 border-t-blue-gray-900 rounded-full animate-spin mx-auto "></div>
           </Button>
         ) : (
-          <Button type="submit" className="mt-6" fullWidth>
+          <Button type="submit" className="mt-6 h-[52px]" fullWidth>
             Submit
           </Button>
         )}
 
-        <Typography color="gray" className="mt-4 text-center font-normal">
+        <Typography color="white" className="mt-4 text-center font-normal">
           Don't have an account ?{" "}
           <button type="button" onClick={() => nav("/signUp")}>
             {" "}
