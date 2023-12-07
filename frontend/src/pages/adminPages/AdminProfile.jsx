@@ -13,21 +13,102 @@ const AdminProfile = () => {
 
   const { user } = useSelector((store) => store.userInfo);
 
-  const { isLoading, isError, data: orders } = useGetAllOrdersQuery(user.token);
+  const {
+    isLoading,
+    isFetching,
+    isError,
+    error,
+    data: orders,
+  } = useGetAllOrdersQuery(user.token);
 
-  if (isLoading) {
-    return <h1>Loading....</h1>;
-  }
+  const orderListSkeleton = () => (
+    <>
+      <tr className="">
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+      </tr>
+      <tr className="">
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+      </tr>
+      <tr className="">
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+      </tr>
+      <tr className="">
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+      </tr>
+    </>
+  );
+  if (isError) return <Error error={error} />;
 
   return (
-    <div className="grid grid-cols-3 gap-9 px-4 py-4">
-      <div>
-        <UpdateAdminForm />
-      </div>
+    <div className="flex flex-col md:grid md:grid-cols-5 gap-9 px-4 py-6">
+      <UpdateAdminForm />
 
-      <div>
-        <Card className="h-full w-full min-w-max table-auto   col-span-2 shadow-2xl">
-          <table className="w-full min-w-max table-auto text-left">
+      <div className="w-full md:col-span-3">
+        <Typography
+          variant="h4"
+          color="blue-gray"
+          className="border-[gray] border-b-2 pb-1 mb-2"
+        >
+          Order List
+        </Typography>
+        <Card className=" w-full  overflow-auto shadow-2xl">
+          <table className="w-full table-auto text-left">
             <thead>
               <tr>
                 {TABLE_HEAD.map((head) => (
@@ -47,73 +128,62 @@ const AdminProfile = () => {
               </tr>
             </thead>
             <tbody>
-              {[...orders]
-                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                .map(({ _id, totalPrice, createdAt, status }, index) => {
-                  const isLast = index === orders.length - 1;
-                  const classes = isLast
-                    ? "p-4"
-                    : "p-4 border-b-[2px] border-blue-gray-100";
-                  const classStatus =
-                    status == "pending"
-                      ? "bg-yellow-200"
-                      : status == "proceed"
-                      ? "bg-green-200"
-                      : "bg-red-200";
-                  return (
-                    <tr key={_id} className={classStatus}>
-                      <td className={classes}>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                        >
-                          {_id}
-                        </Typography>
-                      </td>
-                      <td className={classes}>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                        >
-                          {totalPrice}
-                        </Typography>
-                      </td>
-                      <td className={classes}>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                        >
-                          {dayjs(createdAt).format("MMM D, YYYY")}
-                        </Typography>
-                      </td>
-                      <td className={classes}>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                        >
-                          {status}
-                        </Typography>
-                      </td>
-                      <td className={classes}>
-                        <button onClick={() => nav(`/admin/adminOrder/${_id}`)}>
-                          {" "}
-                          <Typography
-                            as="a"
-                            variant="small"
-                            color="blue"
-                            className="font-medium"
-                          >
-                            Detail..
-                          </Typography>
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
+              {!isFetching ? (
+                <>
+                  {orders ? (
+                    [...orders]
+                      .sort(
+                        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                      )
+                      .map(({ _id, totalPrice, createdAt, status }, index) => {
+                        const isLast = index === orders.length - 1;
+                        const classes = isLast
+                          ? "p-4"
+                          : "p-4 border-b-[2px] border-blue-gray-100";
+                        const classStatus =
+                          status == "pending"
+                            ? "bg-yellow-200"
+                            : status == "proceed"
+                            ? "bg-green-200"
+                            : "bg-red-200";
+                        return (
+                          <tr key={_id} className={classStatus}>
+                            <td className={classes}>
+                              <p className="font-normal">{_id}</p>
+                            </td>
+                            <td className={classes}>
+                              <p className="font-normal">{totalPrice}</p>
+                            </td>
+                            <td className={classes}>
+                              <p className="font-normal">
+                                {dayjs(createdAt).format("MMM D, YYYY")}
+                              </p>
+                            </td>
+                            <td className={classes}>
+                              <p className="font-normal">{status}</p>
+                            </td>
+                            <td className={classes}>
+                              <button
+                                onClick={() => nav(`/admin/adminOrder/${_id}`)}
+                              >
+                                {" "}
+                                <p className="font-medium text-blue-400">
+                                  Detail..
+                                </p>
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                  ) : (
+                    <span className="text-[24px] sm:text-[32px] md:text-[46px] font-bold p-5">
+                      Sorry, Results not found
+                    </span>
+                  )}
+                </>
+              ) : (
+                orderListSkeleton()
+              )}
             </tbody>
           </table>
         </Card>

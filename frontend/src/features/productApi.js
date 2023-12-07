@@ -7,8 +7,20 @@ export const productApi = createApi({
   tagTypes: ["Product"],
   endpoints: (builder) => ({
     getProducts: builder.query({
-      query: () => ({
-        url: "/api/products",
+      query: (filter) => ({
+        url: `/api/products/${filter}`,
+      }),
+      providesTags: ["Product"],
+    }),
+    getSearchProducts: builder.query({
+      query: (search) => ({
+        url: `/api/searchProducts/${search}`,
+      }),
+      providesTags: ["Product"],
+    }),
+    getSimilarProducts: builder.query({
+      query: (id) => ({
+        url: `/api/similarProducts/${id}`,
       }),
       providesTags: ["Product"],
     }),
@@ -67,6 +79,8 @@ export const productApi = createApi({
 
 export const {
   useGetProductsQuery,
+  useGetSearchProductsQuery,
+  useGetSimilarProductsQuery,
   useGetProductByIdQuery,
   useAddProductMutation,
   useUpdateProductMutation,

@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import RootLayout from "./components/RootLayout";
-import "./App.css";
+import "./App.scss";
 
 //route control
 import UserRoutes from "./components/routeControls/UserRoutes";
@@ -17,6 +17,7 @@ import SignUp from "./pages/auth/SignUp";
 // view routes
 import HomePage from "./pages/HomePage";
 import ProductDetail from "./pages/ProductDetail";
+import SearchProduct from "./pages/SearchProduct";
 
 //admin routes
 import ProductList from "./pages/adminPages/ProductList";
@@ -31,6 +32,7 @@ import Shipping from "./pages/userPages/Shipping";
 import OrderPage from "./pages/userPages/OrderPage";
 import UserProfile from "./pages/userPages/UserProfile";
 import OrderDetail from "./pages/UserPages/OrderDetail";
+import NotFound from "./pages/NotFound.jsx";
 
 const App = () => {
   return (
@@ -39,6 +41,7 @@ const App = () => {
         <Route path="/" element={<RootLayout />}>
           <Route index element={<HomePage />} />
           <Route path="productDetail/:id" element={<ProductDetail />} />
+          <Route path="searchProduct/:search" element={<SearchProduct />} />
 
           <Route element={<RouteUsers />}>
             <Route path="login" element={<Login />} />
@@ -60,6 +63,7 @@ const App = () => {
             <Route path="user/profile" element={<UserProfile />} />
             <Route path="user/order/:id" element={<OrderDetail />} />
           </Route>
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
       <ToastContainer autoClose={1200} />

@@ -1,19 +1,20 @@
-import React, { useState } from "react";
-import CardUi from "../components/CardUi";
-import { useGetProductsQuery } from "../features/productApi";
-import ContentWrapper from "../components/ContentWrapper";
-
+import React from "react";
 import {
   Card,
   CardBody,
   CardFooter,
   CardHeader,
 } from "@material-tailwind/react";
+import { useParams } from "react-router-dom";
+import CardUi from "../components/CardUi";
+import { useGetSearchProductsQuery } from "../features/productApi";
+import ContentWrapper from "../components/ContentWrapper";
 
-const HomePage = () => {
-  const [activeBtn, setActiveBtn] = useState("all");
+const SearchProduct = () => {
+  const { search } = useParams();
   const { data, isLoading, error, isError, isFetching } =
-    useGetProductsQuery(activeBtn);
+    useGetSearchProductsQuery(search);
+
   const skeleItem = () => (
     <Card className="mb-[20px] flex flex-col gap-[14px] cursor-pointer rounded-lg h-fit">
       <CardHeader className="relative h-56 aspect-[3/2] shrink-0">
@@ -40,48 +41,6 @@ const HomePage = () => {
 
   return (
     <ContentWrapper>
-      <div className="flex justify-center items-center gap-3 my-6 flex-wrap">
-        <button
-          className={`rounded-md px-4 py-1 border border-black text-black  hover:bg-gray-800 hover:text-white ${
-            activeBtn === "all"
-              ? "bg-gray-800 text-white"
-              : "bg-white text-black"
-          }`}
-          onClick={() => setActiveBtn("all")}
-        >
-          All
-        </button>
-        <button
-          className={`rounded-md px-4 py-1 border border-black text-black ${
-            activeBtn === "men"
-              ? "bg-gray-800 text-white"
-              : "bg-white text-black"
-          } hover:bg-gray-800 hover:text-white `}
-          onClick={() => setActiveBtn("men")}
-        >
-          Men's Clothing
-        </button>
-        <button
-          className={`rounded-md px-4 py-1 border border-black text-black  ${
-            activeBtn === "women"
-              ? "bg-gray-800 text-white"
-              : "bg-white text-black"
-          } hover:bg-gray-800 hover:text-white`}
-          onClick={() => setActiveBtn("women")}
-        >
-          Women's Clothing
-        </button>{" "}
-        <button
-          className={`rounded-md px-4 py-1 border border-black text-black  ${
-            activeBtn === "kid"
-              ? "bg-gray-800 text-white"
-              : "bg-white text-black"
-          } hover:bg-gray-800 hover:text-white`}
-          onClick={() => setActiveBtn("kid")}
-        >
-          Kid's Wear
-        </button>
-      </div>
       {!isFetching ? (
         <>
           {data ? (
@@ -113,4 +72,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default SearchProduct;

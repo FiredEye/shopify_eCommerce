@@ -1,10 +1,8 @@
 import { PencilIcon, UserPlusIcon, TrashIcon } from "@heroicons/react/24/solid";
 import {
   Card,
-  CardHeader,
   Typography,
   Button,
-  CardBody,
   Avatar,
   IconButton,
   Tooltip,
@@ -25,15 +23,16 @@ import {
 } from "../../features/productApi";
 import { baseUrl } from "../../features/constant";
 import { toast } from "react-toastify";
+import ContentWrapper from "../../components/ContentWrapper";
 
 const TABLE_HEAD = ["Products", "Price", "Created At", "Edit", "Delete"];
 
 const ProductList = () => {
   const { user } = useSelector((store) => store.userInfo);
 
-  const { isLoading, isError, data, error } = useGetProductsQuery();
-  if (isLoading) {
-  }
+  const { isLoading, isError, data, error, isFetching } = useGetProductsQuery();
+  if (isError) return <Error error={error} />;
+
   const [
     deleteProduct,
     {
@@ -48,6 +47,7 @@ const ProductList = () => {
   const [productIdToDelete, setProductIdToDelete] = useState({
     id: null,
     product_image: null,
+    product_name: null,
   });
   const handleDeleteBox = () => {
     setOpen(false);
@@ -70,150 +70,235 @@ const ProductList = () => {
     }
   };
   const nav = useNavigate();
-
-  return (
+  const productListSkeleton = () => (
     <>
-      <Card className="h-full w-full">
-        <CardHeader floated={false} shadow={false} className="rounded-none">
-          <div className="mb-5 flex items-center justify-between gap-8">
-            <div>
-              <Typography variant="h5" color="blue-gray">
-                Product List
-              </Typography>
-              <Typography color="gray" className="mt-1 font-normal">
-                See information about all products
-              </Typography>
-            </div>
-            <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-              <Button
-                onClick={() => nav("/addProduct")}
-                className="flex items-center gap-3"
-                color="blue"
-                size="sm"
-              >
-                <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Product
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardBody className="overflow-scroll px-0">
-          <table className="mt-4 w-full min-w-max table-auto text-left">
-            <thead>
-              <tr>
-                {TABLE_HEAD.map((head) => (
-                  <th
-                    key={head}
-                    className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4"
+      <tr className="">
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+      </tr>
+      <tr className="">
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+      </tr>
+      <tr className="">
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+      </tr>
+      <tr className="">
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+        <td className="p-4">
+          <div className="w-full h-[16px] skeleton rounded-md"></div>
+        </td>
+      </tr>
+    </>
+  );
+  return (
+    <ContentWrapper>
+      <div className="mt-8 mb-6 flex flex-col-reverse items-start res_hlg:flex-row res_hlg:items-center justify-between gap-5">
+        <div>
+          <Typography variant="h5" color="blue-gray">
+            Product List
+          </Typography>
+          <Typography color="gray" className="mt-1 font-normal">
+            See information about all products
+          </Typography>
+        </div>
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+          <Button
+            onClick={() => nav("/addProduct")}
+            className="flex items-center gap-3"
+            color="blue"
+            size="sm"
+          >
+            <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Product
+          </Button>
+        </div>
+      </div>
+      <Card
+        color="transparent"
+        shadow={false}
+        className="mx-auto w-full my-5 space-y-9 overflow-x-auto h-[500px]"
+      >
+        <table className="mt-4 w-full min-w-max table-auto text-left">
+          <thead className="sticky top-0 z-[999] bg-gray-400">
+            <tr>
+              {TABLE_HEAD.map((head) => (
+                <th
+                  key={head}
+                  className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4"
+                >
+                  <Typography
+                    variant="small"
+                    color="blue-gray"
+                    className="font-normal leading-none opacity-70"
                   >
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal leading-none opacity-70"
-                    >
-                      {head}
-                    </Typography>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data &&
-                data.map(
-                  (
-                    {
-                      product_image,
-                      product_name,
-                      createdAt,
-                      _id,
-                      product_price,
-                    },
-                    index
-                  ) => {
-                    const isLast = index === products.length - 1;
-                    const classes = isLast
-                      ? "p-4"
-                      : "p-4 border-b border-blue-gray-50";
+                    {head}
+                  </Typography>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {!isFetching ? (
+              <>
+                {data ? (
+                  data.map(
+                    (
+                      {
+                        product_image,
+                        product_name,
+                        createdAt,
+                        _id,
+                        product_price,
+                      },
+                      index
+                    ) => {
+                      const isLast = index === products.length - 1;
+                      const classes = isLast
+                        ? "p-4"
+                        : "p-4 border-b border-blue-gray-50";
 
-                    return (
-                      <tr key={_id}>
-                        <td className={classes}>
-                          <div className="flex items-center gap-3">
-                            <Avatar
-                              src={`${baseUrl}${product_image}`}
-                              size="sm"
-                            />
+                      return (
+                        <tr key={_id}>
+                          <td className={classes}>
+                            <div className="flex items-center gap-3">
+                              <Avatar
+                                src={`${baseUrl}${product_image}`}
+                                size="sm"
+                              />
+                              <div className="flex flex-col">
+                                <Typography
+                                  variant="small"
+                                  color="blue-gray"
+                                  className="font-normal"
+                                >
+                                  {product_name}
+                                </Typography>
+                              </div>
+                            </div>
+                          </td>
+                          <td className={classes}>
                             <div className="flex flex-col">
                               <Typography
                                 variant="small"
                                 color="blue-gray"
                                 className="font-normal"
                               >
-                                {product_name}
+                                Rs.{product_price}
                               </Typography>
                             </div>
-                          </div>
-                        </td>
-                        <td className={classes}>
-                          <div className="flex flex-col">
+                          </td>
+
+                          <td className={classes}>
                             <Typography
                               variant="small"
                               color="blue-gray"
                               className="font-normal"
                             >
-                              Rs.{product_price}
+                              {dayjs(createdAt).format("MMM D, YYYY")}
                             </Typography>
-                          </div>
-                        </td>
+                          </td>
 
-                        <td className={classes}>
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal"
-                          >
-                            {dayjs(createdAt).format("MMM D, YYYY")}
-                          </Typography>
-                        </td>
+                          <td className={classes}>
+                            <Tooltip content="Edit Product">
+                              <IconButton
+                                onClick={() => nav(`/editProduct/${_id}`)}
+                                variant="text"
+                                color="blue-gray"
+                              >
+                                <PencilIcon className="h-4 w-4" />
+                              </IconButton>
+                            </Tooltip>
+                          </td>
 
-                        <td className={classes}>
-                          <Tooltip content="Edit Product">
-                            <IconButton
-                              onClick={() => nav(`/editProduct/${_id}`)}
-                              variant="text"
-                              color="blue-gray"
-                            >
-                              <PencilIcon className="h-4 w-4" />
-                            </IconButton>
-                          </Tooltip>
-                        </td>
-
-                        <td className={classes}>
-                          <Tooltip content="Remove Product">
-                            <IconButton
-                              onClick={() => {
-                                setOpen(true);
-                                setProductIdToDelete({
-                                  id: _id,
-                                  product_image,
-                                });
-                              }}
-                              variant="text"
-                              color="red"
-                            >
-                              <TrashIcon className="h-4 w-4" />
-                            </IconButton>
-                          </Tooltip>
-                        </td>
-                      </tr>
-                    );
-                  }
+                          <td className={classes}>
+                            <Tooltip content="Remove Product">
+                              <IconButton
+                                onClick={() => {
+                                  setOpen(true);
+                                  setProductIdToDelete({
+                                    id: _id,
+                                    product_image,
+                                    product_name,
+                                  });
+                                }}
+                                variant="text"
+                                color="red"
+                              >
+                                <TrashIcon className="h-4 w-4" />
+                              </IconButton>
+                            </Tooltip>
+                          </td>
+                        </tr>
+                      );
+                    }
+                  )
+                ) : (
+                  <span className="text-[24px] sm:text-[32px] md:text-[46px] font-bold p-5">
+                    Sorry, Results not found
+                  </span>
                 )}
-            </tbody>
-          </table>
-        </CardBody>
+              </>
+            ) : (
+              productListSkeleton()
+            )}
+          </tbody>
+        </table>
       </Card>
       <Dialog open={open} handler={handleDeleteBox}>
-        <DialogHeader>Delete Product.</DialogHeader>
+        <DialogHeader>
+          Delete Product. ({productIdToDelete?.product_name})
+        </DialogHeader>
         <DialogBody divider>Once deleted cannot be retrieved.</DialogBody>
         <DialogFooter>
           <Button
@@ -240,7 +325,7 @@ const ProductList = () => {
           )}
         </DialogFooter>
       </Dialog>
-    </>
+    </ContentWrapper>
   );
 };
 

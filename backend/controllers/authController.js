@@ -19,7 +19,12 @@ const userRegister = async (req, res) => {
       res.status(403).json("Email already exist!!");
     } else {
       const hash = await bcrypt.hash(password, 12);
-      await User.create({ fullname, email, password: hash });
+      await User.create({
+        fullname,
+        email,
+        password: hash,
+        profile_image: req.image,
+      });
       res.status(201).json("user created sucessfully");
     }
   } catch (err) {
@@ -48,6 +53,7 @@ const userLogin = async (req, res) => {
           fullname: isExist.fullname,
           isAdmin: isExist.isAdmin,
           shippingAddress: isExist.shippingAddress,
+          profile_image: isExist.profile_image,
         });
       return res.status(401).json("password does not match");
     } else {
@@ -62,11 +68,22 @@ const updateUserDetail = async (req, res) => {
   try {
     const { _id } = req.user;
     const { fullname, address, city } = req.body;
-    const response = await User.findByIdAndUpdate(_id, {
+
+    const updateObject = {
       fullname,
       shippingAddress: { address, city, isEmpty: false },
+    };
+    if (req.image) {
+      updateObject.profile_image = req.image;
+    }
+    const response = await User.findByIdAndUpdate(_id, updateObject, {
+      new: true,
     });
-    res.status(201).json("User details updated successfully");
+    res.status(201).json({
+      fullname: response.fullname,
+      shippingAddress: response.shippingAddress,
+      profile_image: response.profile_image,
+    });
   } catch (err) {
     res.status(401).json(err);
   }
@@ -74,11 +91,21 @@ const updateUserDetail = async (req, res) => {
 const updateAdminDetail = async (req, res) => {
   try {
     const { fullname, email } = req.body;
-    const response = await User.findByIdAndUpdate(req.adminId, {
+    const updateObject = {
       fullname,
       email,
+    };
+    if (req.image) {
+      updateObject.profile_image = req.image;
+    }
+    const response = await User.findByIdAndUpdate(req.adminId, updateObject, {
+      new: true,
     });
-    res.status(201).json("User details updated successfully");
+    res.status(201).json({
+      fullname: response.fullname,
+      email: response.email,
+      profile_image: response.profile_image,
+    });
   } catch (err) {
     res.status(401).json(err);
   }

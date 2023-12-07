@@ -14,13 +14,14 @@ import {
 import {
   UserCircleIcon,
   ChevronDownIcon,
-  LifebuoyIcon,
   PowerIcon,
   ShoppingCartIcon,
 } from "@heroicons/react/24/outline";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearAll } from "../features/userSlice";
+import { baseUrl } from "../features/constant";
+
 import ContentWrapper from "./ContentWrapper";
 const menuItems = [
   {
@@ -65,12 +66,12 @@ const Header = () => {
 
   const handleSearch = () => {
     if (search) {
-      nav(`movie/search/${search.trim()}`);
+      nav(`/searchProduct/${search.trim()}`);
       setSearch("");
     }
   };
   return (
-    <div className="h-[60px] bg-gray-900 text-gray-200 sticky top-0 z-[999]">
+    <div className="h-[60px] bg-[#191919] text-white">
       <ContentWrapper>
         <div className=" flex justify-between  items-center  text-center font-bold">
           <Typography className=" cursor-pointer py-1.5 font-medium">
@@ -88,9 +89,9 @@ const Header = () => {
               <div className="relative flex w-full gap-2 md:w-max">
                 <Input
                   type="text"
-                  color="white"
                   label="Search Products..."
                   className="pr-[52px]"
+                  color="white"
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyUp={(e) => {
                     if (e.key === "Enter") {
@@ -126,7 +127,7 @@ const Header = () => {
                 </Button>
               </div>
               {!user && (
-                <div className="bg-green-400 px-2 py-1 rounded-md  hover:bg-green-500">
+                <div className="bg-green-500 px-2 py-1 rounded-md  hover:bg-green-600">
                   <NavLink to="/login">Login</NavLink>
                 </div>
               )}
@@ -169,7 +170,7 @@ const Header = () => {
                       size="sm"
                       alt="tania andrew"
                       className="border border-blue-500 p-0.5"
-                      src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
+                      src={`${baseUrl}${user.profile_image}`}
                     />
                     <ChevronDownIcon
                       strokeWidth={2.5}
@@ -232,7 +233,7 @@ const Header = () => {
             )}
           </div>
           {showInput && (
-            <div className="absolute top-[60px] left-0 h-[70px] w-full  res_hlg:hidden bg-gray-900">
+            <div className="absolute top-[60px] left-0 h-[70px] w-full  res_hlg:hidden bg-[#191919]">
               <ContentWrapper>
                 <input
                   className=" w-full p-[15px] res_hlg:hidden border outline-none text-black rounded"

@@ -6,10 +6,12 @@ module.exports = withMT({
   theme: {
     extend: {
       screens: {
+        res_xxm: "450px",
         res_xm: "650px",
         res_sm: "900px",
         res_md: "1260px",
         res_hlg: "500px",
+        res_pdmd: "1200px",
       },
     },
   },

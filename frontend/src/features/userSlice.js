@@ -50,11 +50,15 @@ const userSlice = createSlice({
       state.user.shippingAddress =
         action.payload.shippingAddress || state.user.shippingAddress;
       state.user.fullname = action.payload.fullname || state.user.fullname;
+      state.user.profile_image =
+        action.payload.profile_image || state.user.profile_image;
       setUser(state.user);
     },
     adminUpdate: (state, action) => {
       state.user.fullname = action.payload.fullname || state.user.fullname;
       state.user.email = action.payload.email || state.user.email;
+      state.user.profile_image =
+        action.payload.profile_image || state.user.profile_image;
       setUser(state.user);
     },
   },

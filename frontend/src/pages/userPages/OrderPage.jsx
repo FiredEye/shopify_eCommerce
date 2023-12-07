@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router";
-import { Button } from "@material-tailwind/react";
+import { Button, Card } from "@material-tailwind/react";
 import { useDispatch, useSelector } from "react-redux";
 import { useAddOrderMutation } from "../../features/orderApi";
 import { clearCartItem } from "../../features/userSlice";
 import { toast } from "react-toastify";
+import ContentWrapper from "../../components/ContentWrapper";
 
 const OrderPage = () => {
   const { carts, user } = useSelector((store) => store.userInfo);
@@ -34,29 +35,35 @@ const OrderPage = () => {
   };
 
   return (
-    <div className="p-10 space-y-10">
-      <h1>Delivery Address</h1>
+    <ContentWrapper>
+      <Card
+        color="transparent"
+        shadow={false}
+        className="mx-auto max-w-xl mt-5 space-y-9 text-black items-center"
+      >
+        <div className="flex flex-col gap-3 items-center">
+          <p className="text-[26px] font-bold">Delivery Address:</p>
+          <p className="text-[18px] font-semibold">
+            {user.shippingAddress.address}, {user.shippingAddress.city}
+          </p>
 
-      <p className="text-gray-700">
-        {user.shippingAddress.address}, {user.shippingAddress.city}
-      </p>
-
-      <p>Total Amount is: Rs {total}</p>
-
-      {isLoading ? (
-        <Button type="submit" className="mt-6 max-w-lg" fullWidth>
-          <div className="h-7 w-7 border-2 border-t-blue-gray-900 rounded-full animate-spin mx-auto "></div>
-        </Button>
-      ) : (
-        <Button
-          onClick={() => orderAdd(total, carts)}
-          className="mt-6 max-w-lg py-[18px]"
-          fullWidth
-        >
-          CheckOut
-        </Button>
-      )}
-    </div>
+          <p className="text-[20px] font-semibold">Total Amount: Rs {total}</p>
+        </div>
+        {isLoading ? (
+          <Button type="submit" className="mt-6 max-w-lg" fullWidth>
+            <div className="h-7 w-7 border-2 border-t-blue-gray-900 rounded-full animate-spin mx-auto "></div>
+          </Button>
+        ) : (
+          <Button
+            onClick={() => orderAdd(total, carts)}
+            className="mt-6 max-w-lg py-[18px]"
+            fullWidth
+          >
+            CheckOut
+          </Button>
+        )}
+      </Card>
+    </ContentWrapper>
   );
 };
 export default OrderPage;

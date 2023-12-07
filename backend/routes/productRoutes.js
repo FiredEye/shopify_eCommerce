@@ -4,19 +4,21 @@ const productController = require("../controllers/productController");
 const check = require("../middlewares/authCheck");
 const checkFile = require("../middlewares/fileCheck");
 
-router.get("/api/products", productController.getAllProducts);
+router.get("/api/products/:filter", productController.getAllProducts);
+router.get("/api/searchProducts/:search", productController.getSearchProducts);
+router.get("/api/similarProducts/:id", productController.getSimilarProducts);
 router.get("/api/product/:id", productController.getProductById);
 router.patch(
   "/api/updateProduct/:id",
   check.checkAdmin,
-  checkFile.updateFile,
+  checkFile.updateProductFile,
   productController.updateProductById
 );
 router.post(
   "/api/addProduct",
   check.checkUser,
   check.checkAdmin,
-  checkFile.checkFile,
+  checkFile.checkProductFile,
   productController.createProduct
 );
 router.delete(

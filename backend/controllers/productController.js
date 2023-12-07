@@ -31,11 +31,59 @@ const createProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find();
+    let query = {};
+
+    const filter = req.params.filter;
+
+    if (filter && filter.toLowerCase() !== "all") {
+      query = { category: filter.toLowerCase() };
+    }
+    const products = await Product.find(query);
     return res.status(200).json(products);
   } catch (err) {
     console.log(err);
     return res.status(400).json(`${err}`);
+  }
+};
+const getSearchProducts = async (req, res) => {
+  try {
+    const search = req.params.search;
+
+    let query = {};
+
+    if (search) {
+      query.$text = { $search: search };
+    }
+
+    const products = await Product.find(query);
+    return res.status(200).json(products);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+const getSimilarProducts = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    if (mongoose.isValidObjectId(productId)) {
+      const currentProduct = await Product.findById(productId);
+
+      if (!currentProduct) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+
+      const similarProducts = await Product.find({
+        $text: {
+          $search: `${currentProduct.product_name} ${currentProduct.category} ${currentProduct.brand} ${currentProduct.product_detail}`,
+        },
+        _id: { $ne: productId },
+      }).limit(6);
+
+      return res.status(200).json(similarProducts);
+    }
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -49,7 +97,7 @@ const getProductById = async (req, res) => {
         populate: {
           path: "user_info",
           model: "user",
-          select: "fullname",
+          select: ["fullname", "profile_image"],
         },
       });
       return res.status(200).json(product);
@@ -128,6 +176,8 @@ function calculateAverageRating(reviews) {
 module.exports = {
   createProduct,
   getAllProducts,
+  getSearchProducts,
+  getSimilarProducts,
   getProductById,
   updateProductById,
   deleteProductById,
