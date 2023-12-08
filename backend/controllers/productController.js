@@ -155,19 +155,17 @@ const addReview = async (req, res) => {
   const id = req.params.id;
 
   try {
-    const newReview = { user_info: req.user._id, ...req.body };
-
     if (mongoose.isValidObjectId(id)) {
-      const product = await Product.findById(id);
-      const isExist = product.reviews.find(
-        (review) => review.user_info.toString() === req.user._id.toString()
-      );
+      const existingReview = await Product.findOne({
+        _id: id,
+        "reviews.user_info": req.user._id,
+      });
 
-      if (isExist) {
-        return res
-          .status(402)
-          .json({ message: "user can review only once", status: "bad" });
+      if (existingReview) {
+        return res.status(400).json({ message: "Users can only review once!" });
       }
+      const product = await Product.findById(id);
+      const newReview = { user_info: req.user._id, ...req.body };
 
       product.reviews.push(newReview);
       product.numReviews = product.reviews.length;

@@ -36,8 +36,7 @@ const Review = ({ product }) => {
           id: product._id,
           token: user.token,
         }).unwrap();
-        console.log(response);
-        if (response.status == "bad") toast.error(response.message);
+
         toast.success(response);
         formik.resetForm();
       } catch (err) {

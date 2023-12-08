@@ -31,6 +31,7 @@ router.delete(
 router.patch(
   "/api/reviewProduct/:id",
   check.checkUser,
+  check.hasOrderedProduct,
   productController.addReview
 );
 
