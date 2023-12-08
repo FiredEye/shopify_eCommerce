@@ -3,7 +3,7 @@ const user = require("../models/user");
 const checkAdmin = async (req, res, next) => {
   const token = req.headers.authorization;
   if (!token) return res.status(404).json("not authorized");
-  const decode = jwt.decode(token, "jsontoken");
+  const decode = jwt.decode(token, process.env.JWT_SECRET);
   if (!decode) return res.status(404).json("not authorized");
   const { isAdmin, id } = decode;
   if (!isAdmin) return res.status(404).json("not authorized");
@@ -14,7 +14,7 @@ const checkAdmin = async (req, res, next) => {
 const checkUser = async (req, res, next) => {
   const token = req.headers.authorization;
   if (!token) return res.status(404).json("not authorized");
-  const decode = jwt.decode(token, "jsontoken");
+  const decode = jwt.decode(token, process.env.JWT_SECRET);
   if (!decode) return res.status(404).json("not authorized");
   const { id } = decode;
   const User = await user.findById(id).select("-password");

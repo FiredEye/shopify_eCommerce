@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardBody,
@@ -12,6 +12,8 @@ import ContentWrapper from "../components/ContentWrapper";
 
 const SearchProduct = () => {
   const { search } = useParams();
+  const [page, setPage] = useState(1);
+
   const { data, isLoading, error, isError, isFetching } =
     useGetSearchProductsQuery(search);
 
@@ -41,12 +43,15 @@ const SearchProduct = () => {
 
   return (
     <ContentWrapper>
+      <h1 className="my-4 text-[32px] font-bold">
+        Search reasults for -"{search}"
+      </h1>
       {!isFetching ? (
         <>
-          {data ? (
+          {data?.products && data?.products.length > 0 ? (
             <div className=" grid grid-cols-1 gap-y-10 gap-x-5 justify-between res_xm:grid-cols-2 res_sm:grid-cols-3 res_md:grid-cols-4 my-[50px] mx-5 ">
               {!isFetching &&
-                data.map((product) => {
+                data?.products.map((product) => {
                   return <CardUi key={product._id} product={product} />;
                 })}
             </div>
@@ -66,6 +71,39 @@ const SearchProduct = () => {
           {skeleItem()}
           {skeleItem()}
           {skeleItem()}
+        </div>
+      )}
+      {!isFetching && (
+        <div className="flex justify-center px-5 my-5 gap-4 items-center">
+          <button
+            onClick={() => {
+              setPage((prevPage) => Math.max(prevPage - 1, 1));
+            }}
+            className={`py-2 px-4 rounded bg-gray-800 text-white hover:bg-black ${
+              page == 1 || page == undefined
+                ? "cursor-not-allowed"
+                : "cursor-pointer"
+            }`}
+            disabled={page == 1 || page == undefined ? true : false}
+          >
+            Prev
+          </button>
+          <p>
+            {page} - of - {data?.totalPages}
+          </p>
+          <button
+            onClick={() => {
+              setPage((prevPage) => Math.min(prevPage + 1, data?.totalPages));
+            }}
+            className={`py-2 px-4 rounded bg-gray-800 text-white hover:bg-black ${
+              page >= data?.totalPages || page == undefined
+                ? "cursor-not-allowed"
+                : "cursor-pointer"
+            }`}
+            disabled={page >= data?.totalPages ? true : false}
+          >
+            Next
+          </button>
         </div>
       )}
     </ContentWrapper>

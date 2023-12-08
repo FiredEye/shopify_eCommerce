@@ -92,6 +92,7 @@ const Header = () => {
                   label="Search Products..."
                   className="pr-[52px]"
                   color="white"
+                  value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyUp={(e) => {
                     if (e.key === "Enter") {
@@ -238,6 +239,7 @@ const Header = () => {
                 <input
                   className=" w-full p-[15px] res_hlg:hidden border outline-none text-black rounded"
                   placeholder="Search Products..."
+                  value={search}
                   onKeyUp={(e) => {
                     if (e.key === "Enter") {
                       handleSearch();

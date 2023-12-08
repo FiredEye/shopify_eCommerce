@@ -4,7 +4,7 @@ const productController = require("../controllers/productController");
 const check = require("../middlewares/authCheck");
 const checkFile = require("../middlewares/fileCheck");
 
-router.get("/api/products/:filter", productController.getAllProducts);
+router.get("/api/products/:category", productController.getAllProducts);
 router.get("/api/searchProducts/:search", productController.getSearchProducts);
 router.get("/api/similarProducts/:id", productController.getSimilarProducts);
 router.get("/api/product/:id", productController.getProductById);

@@ -44,7 +44,7 @@ const userLogin = async (req, res) => {
           id: isExist._id,
           isAdmin: isExist.isAdmin,
         },
-        "jsontoken"
+        process.env.JWT_SECRET
       );
       if (isPass)
         return res.status(201).json({

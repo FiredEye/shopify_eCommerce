@@ -33,13 +33,21 @@ const getAllProducts = async (req, res) => {
   try {
     let query = {};
 
-    const filter = req.params.filter;
+    const category = req.params.category;
 
-    if (filter && filter.toLowerCase() !== "all") {
-      query = { category: filter.toLowerCase() };
+    if (category && category.toLowerCase() !== "all") {
+      query = { category: category.toLowerCase() };
     }
-    const products = await Product.find(query);
-    return res.status(200).json(products);
+    const page = parseInt(req.query.page) || 1;
+    const limit = 12;
+
+    const skip = (page - 1) * limit;
+    const totalProductsCount = await Product.countDocuments(query);
+
+    const totalPages = Math.ceil(totalProductsCount / limit);
+
+    const products = await Product.find(query).skip(skip).limit(limit);
+    return res.status(200).json({ products, totalPages });
   } catch (err) {
     console.log(err);
     return res.status(400).json(`${err}`);
@@ -54,9 +62,16 @@ const getSearchProducts = async (req, res) => {
     if (search) {
       query.$text = { $search: search };
     }
+    const page = parseInt(req.query.page) || 1;
+    const limit = 12;
+    const skip = (page - 1) * limit;
+    const totalProductsCount = await Product.countDocuments(query);
 
-    const products = await Product.find(query);
-    return res.status(200).json(products);
+    const totalPages = Math.ceil(totalProductsCount / limit);
+
+    const products = await Product.find(query).skip(skip).limit(limit);
+
+    return res.status(200).json({ products, totalPages });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Internal Server Error" });

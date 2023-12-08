@@ -29,8 +29,12 @@ const TABLE_HEAD = ["Products", "Price", "Created At", "Edit", "Delete"];
 
 const ProductList = () => {
   const { user } = useSelector((store) => store.userInfo);
+  const [page, setPage] = useState(1);
 
-  const { isLoading, isError, data, error, isFetching } = useGetProductsQuery();
+  const { data, isLoading, error, isError, isFetching } = useGetProductsQuery({
+    category: "all",
+    page,
+  });
   if (isError) return <Error error={error} />;
 
   const [
@@ -191,8 +195,8 @@ const ProductList = () => {
           <tbody>
             {!isFetching ? (
               <>
-                {data ? (
-                  data.map(
+                {data?.products ? (
+                  data?.products.map(
                     (
                       {
                         product_image,
@@ -295,6 +299,39 @@ const ProductList = () => {
           </tbody>
         </table>
       </Card>
+      {!isFetching && (
+        <div className="flex justify-center px-5 my-5 gap-4 items-center">
+          <button
+            onClick={() => {
+              setPage((prevPage) => Math.max(prevPage - 1, 1));
+            }}
+            className={`py-2 px-4 rounded bg-gray-800 text-white hover:bg-black ${
+              page == 1 || page == undefined
+                ? "cursor-not-allowed"
+                : "cursor-pointer"
+            }`}
+            disabled={page == 1 || page == undefined ? true : false}
+          >
+            Prev
+          </button>
+          <p>
+            {page} - of - {data?.totalPages}
+          </p>
+          <button
+            onClick={() => {
+              setPage((prevPage) => Math.min(prevPage + 1, data?.totalPages));
+            }}
+            className={`py-2 px-4 rounded bg-gray-800 text-white hover:bg-black ${
+              page >= data?.totalPages || page == undefined
+                ? "cursor-not-allowed"
+                : "cursor-pointer"
+            }`}
+            disabled={page >= data?.totalPages ? true : false}
+          >
+            Next
+          </button>
+        </div>
+      )}
       <Dialog open={open} handler={handleDeleteBox}>
         <DialogHeader>
           Delete Product. ({productIdToDelete?.product_name})

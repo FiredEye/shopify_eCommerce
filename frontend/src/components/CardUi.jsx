@@ -26,11 +26,11 @@ const CardUi = ({ product }) => {
         <Image src={`${baseUrl}${product.product_image}`} alt="product image" />
       </CardHeader>
       <CardBody>
-        <Typography variant="h5" className="mb-2">
+        <p className="text-[22px] font-semibold mb-2 line-clamp-1">
           {product.product_name}
-        </Typography>
-        <p className="md:h-[60px] line-clamp-1 sm:line-clamp-2">
-          {product.product_detail}sss
+        </p>
+        <p className="md:h-[52px] line-clamp-1 sm:line-clamp-2 mb-1">
+          {product.product_detail}
         </p>
 
         <div>

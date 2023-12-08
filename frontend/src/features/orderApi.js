@@ -7,8 +7,9 @@ export const orderApi = createApi({
   tagTypes: ["order"],
   endpoints: (builder) => ({
     getAllOrders: builder.query({
-      query: (token) => ({
+      query: ({ token, page }) => ({
         url: "/api/getOrders",
+        params: { page },
         headers: {
           Authorization: token,
         },
@@ -17,8 +18,9 @@ export const orderApi = createApi({
     }),
 
     getOrderByUser: builder.query({
-      query: (token) => ({
+      query: ({ token, page }) => ({
         url: "/api/getUserOrder",
+        params: { page },
         headers: {
           Authorization: token,
         },

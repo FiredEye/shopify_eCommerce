@@ -2,11 +2,22 @@ const Order = require("../models/order");
 
 const getAllOrder = async (req, res) => {
   try {
-    const orders = await Order.find().populate({
-      path: "user",
-      select: ["email", "fullname"],
-    });
-    return res.status(200).json(orders);
+    const page = parseInt(req.query.page) || 1;
+    const limit = 6;
+
+    const skip = (page - 1) * limit;
+    const totalOrdersCount = await Order.countDocuments({});
+    const totalPages = Math.ceil(totalOrdersCount / limit);
+
+    const orders = await Order.find()
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "user",
+        select: ["email", "fullname"],
+      })
+      .skip(skip)
+      .limit(limit);
+    return res.status(200).json({ orders, totalPages });
   } catch (err) {
     return res.status(400).json({
       status: "error",
@@ -42,8 +53,23 @@ const getOrderByIdForAdmin = async (req, res) => {
 };
 const getOrderByUser = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req?.user._id });
-    return res.status(200).json(orders);
+    const page = parseInt(req.query.page) || 1;
+    const limit = 6;
+
+    const skip = (page - 1) * limit;
+    const totalOrdersCount = await Order.countDocuments({
+      user: req?.user._id,
+    });
+
+    const totalPages = Math.ceil(totalOrdersCount / limit);
+
+    const orders = await Order.find({ user: req?.user._id })
+      .sort({
+        createdAt: -1,
+      })
+      .skip(skip)
+      .limit(limit);
+    return res.status(200).json({ orders, totalPages });
   } catch (err) {
     console.log(err);
     return res.status(400).json({
