@@ -11,7 +11,7 @@ const getUsers = async (req, res) => {
 };
 
 const userRegister = async (req, res) => {
-  const { fullname, email, password } = req.body;
+  const { fullname, email, password, profile_image } = req.body;
 
   try {
     const isExist = await User.findOne({ email });
@@ -23,7 +23,7 @@ const userRegister = async (req, res) => {
         fullname,
         email,
         password: hash,
-        profile_image: req.image,
+        profile_image,
       });
       res.status(201).json("user created sucessfully");
     }
@@ -67,49 +67,70 @@ const userLogin = async (req, res) => {
 const updateUserDetail = async (req, res) => {
   try {
     const { _id } = req.user;
-    const { fullname, address, city } = req.body;
+    const { fullname, address, city, profile_image = "" } = req.body;
 
     const updateObject = {
       fullname,
       shippingAddress: { address, city, isEmpty: false },
     };
-    if (req.image) {
-      updateObject.profile_image = req.image;
+
+    if (profile_image) {
+      updateObject.profile_image = profile_image;
     }
+
     const response = await User.findByIdAndUpdate(_id, updateObject, {
       new: true,
     });
-    res.status(201).json({
+
+    if (!response) {
+      // User not found
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({
       fullname: response.fullname,
       shippingAddress: response.shippingAddress,
       profile_image: response.profile_image,
     });
   } catch (err) {
-    res.status(401).json(err);
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 const updateAdminDetail = async (req, res) => {
   try {
-    const { fullname, email } = req.body;
+    const { fullname, email, profile_image = "" } = req.body;
+
     const updateObject = {
       fullname,
       email,
     };
-    if (req.image) {
-      updateObject.profile_image = req.image;
+
+    if (profile_image) {
+      updateObject.profile_image = profile_image;
     }
+
     const response = await User.findByIdAndUpdate(req.adminId, updateObject, {
       new: true,
     });
-    res.status(201).json({
+
+    if (!response) {
+      // User not found
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({
       fullname: response.fullname,
       email: response.email,
       profile_image: response.profile_image,
     });
   } catch (err) {
-    res.status(401).json(err);
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 module.exports = {
   getUsers,
   userRegister,

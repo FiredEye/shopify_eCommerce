@@ -4,6 +4,9 @@ import { useNavigate } from "react-router";
 import { useFormik } from "formik";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
+import { v4 as uuidv4 } from "uuid";
+import { storage } from "../../../firebaseConfig";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useRegisterUserMutation } from "../../features/authApi";
 import ContentWrapper from "../../components/ContentWrapper";
 
@@ -38,13 +41,19 @@ const SignUp = () => {
       preview: null,
     },
     onSubmit: async (val) => {
-      let formData = new FormData();
-      formData.append("fullname", val.fullname);
-      formData.append("email", val.email);
-      formData.append("password", val.password);
-      formData.append("profile_image", val.profile_image);
-
       try {
+        const fileName = uuidv4() + path.extname(val.profile_image.name);
+        const storageRef = ref(storage, "profiles/" + fileName);
+
+        const uploadTask = uploadBytesResumable(storageRef, val.profile_image);
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+        let formData = new FormData();
+        formData.append("fullname", val.fullname);
+        formData.append("email", val.email);
+        formData.append("password", val.password);
+        formData.append("profile_image", downloadURL);
+
         const response = await userRegistration(formData).unwrap();
 
         toast.success("User registered sucessfully.");

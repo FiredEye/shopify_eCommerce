@@ -2,6 +2,13 @@ import { Card, Typography, Input, Button } from "@material-tailwind/react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import {
+  ref,
+  deleteObject,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
+import { storage } from "../../../firebaseConfig";
 import { useAdminUpdateMutation } from "../../features/authApi";
 import { toast } from "react-toastify";
 import { adminUpdate } from "../../features/userSlice";
@@ -41,19 +48,44 @@ const UpdateAdminForm = () => {
       preview: `${user.profile_image}`,
     },
     onSubmit: async (val) => {
-      let formData = new FormData();
-      formData.append("fullname", val.fullname);
-      formData.append("email", val.email);
-
       try {
-        if (formik.values.profile_image !== null) {
-          formData.append("profile_image", val.profile_image);
-          formData.append("old_imgPath", user.profile_image);
+        const formData = new FormData();
+        formData.append("fullname", val.fullname);
+        formData.append("email", val.email);
+
+        if (val.profile_image) {
+          if (user.profile_image) {
+            const pathInStorage = user.profile_image
+              .split("/")
+              .slice(3)
+              .join("/");
+            const oldFileRef = ref(storage, pathInStorage);
+
+            try {
+              await deleteObject(oldFileRef);
+              console.log("File deleted successfully.");
+            } catch (deleteError) {
+              console.error("Error deleting file:", deleteError);
+            }
+          }
+
+          const fileName = uuidv4() + path.extname(val.profile_image.name);
+          const storageRef = ref(storage, "profiles/" + fileName);
+          const uploadTask = uploadBytesResumable(
+            storageRef,
+            val.profile_image
+          );
+          formData.append(
+            "profile_image",
+            await getDownloadURL(uploadTask.snapshot.ref)
+          );
         }
+
         const response = await update({
           body: formData,
           token: user.token,
         }).unwrap();
+
         if (response) {
           dispatch(
             adminUpdate({
@@ -64,11 +96,13 @@ const UpdateAdminForm = () => {
           );
           toast.success("User details updated!");
         }
+
         setIsImage(false);
       } catch (err) {
         toast.error(err.data);
       }
     },
+
     validationSchema: isImage
       ? Yup.object().shape({
           ...alwaysValidateSchema.fields,
