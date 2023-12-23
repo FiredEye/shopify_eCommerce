@@ -18,13 +18,13 @@ router.post(
   "/api/addProduct",
   check.checkUser,
   check.checkAdmin,
-  checkFile.checkProductFile,
+  // checkFile.checkProductFile,
   productController.createProduct
 );
 router.delete(
   "/api/deleteProduct/:id",
   check.checkAdmin,
-  checkFile.deleteFile,
+  // checkFile.deleteFile,
   productController.deleteProductById
 );
 

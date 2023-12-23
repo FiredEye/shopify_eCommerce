@@ -100,16 +100,7 @@ const updateUserDetail = async (req, res) => {
 
 const updateAdminDetail = async (req, res) => {
   try {
-    const { fullname, email, profile_image = "" } = req.body;
-
-    const updateObject = {
-      fullname,
-      email,
-    };
-
-    if (profile_image) {
-      updateObject.profile_image = profile_image;
-    }
+    const updateObject = req.body;
 
     const response = await User.findByIdAndUpdate(req.adminId, updateObject, {
       new: true,

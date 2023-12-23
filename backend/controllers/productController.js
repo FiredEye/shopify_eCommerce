@@ -9,6 +9,7 @@ const createProduct = async (req, res) => {
     brand,
     category,
     countInStock,
+    product_image,
   } = req.body;
 
   try {
@@ -16,7 +17,7 @@ const createProduct = async (req, res) => {
       product_name,
       product_detail,
       product_price,
-      product_image: req.image,
+      product_image,
       brand,
       category,
       countInStock,
@@ -125,9 +126,7 @@ const getProductById = async (req, res) => {
 const updateProductById = async (req, res) => {
   const id = req.params.id;
   const updateObject = req.body;
-  if (req.image) {
-    updateObject.product_image = req.image;
-  }
+
   try {
     if (mongoose.isValidObjectId(id)) {
       const response = await Product.findByIdAndUpdate(id, updateObject);

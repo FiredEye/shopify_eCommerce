@@ -2,6 +2,8 @@ import { Card, Typography, Input, Button } from "@material-tailwind/react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { v4 as uuidv4 } from "uuid";
+
 import {
   ref,
   deleteObject,
@@ -15,7 +17,8 @@ import { adminUpdate } from "../../features/userSlice";
 import { useState } from "react";
 
 const UpdateAdminForm = () => {
-  const [update, { isLoading }] = useAdminUpdateMutation();
+  const [isLoading, setIsLoading] = useState(false);
+  const [update] = useAdminUpdateMutation();
   const [isImage, setIsImage] = useState(false);
 
   const alwaysValidateSchema = Yup.object().shape({
@@ -49,38 +52,45 @@ const UpdateAdminForm = () => {
     },
     onSubmit: async (val) => {
       try {
+        setIsLoading(true);
         const formData = new FormData();
         formData.append("fullname", val.fullname);
         formData.append("email", val.email);
 
-        if (val.profile_image) {
-          if (user.profile_image) {
-            const pathInStorage = user.profile_image
-              .split("/")
-              .slice(3)
-              .join("/");
-            const oldFileRef = ref(storage, pathInStorage);
+        if (val.profile_image && user.profile_image) {
+          const url = new URL(user.profile_image);
 
-            try {
-              await deleteObject(oldFileRef);
-              console.log("File deleted successfully.");
-            } catch (deleteError) {
-              console.error("Error deleting file:", deleteError);
-            }
+          const pathWithQuery = decodeURIComponent(url.pathname);
+          const pathAfterO = pathWithQuery.split("/o/")[1];
+
+          const desertRef = ref(storage, pathAfterO);
+
+          // Delete the file
+          try {
+            // Delete the file
+            await deleteObject(desertRef);
+          } catch (deleteError) {
+            console.error("Error deleting file:", deleteError);
+            // Handle the error or log as needed
           }
-
-          const fileName = uuidv4() + path.extname(val.profile_image.name);
+          const fileName = `${uuidv4()}.${val.profile_image.name
+            .split(".")
+            .pop()}`;
           const storageRef = ref(storage, "profiles/" + fileName);
-          const uploadTask = uploadBytesResumable(
-            storageRef,
-            val.profile_image
-          );
-          formData.append(
-            "profile_image",
-            await getDownloadURL(uploadTask.snapshot.ref)
-          );
-        }
+          try {
+            const uploadTask = uploadBytesResumable(
+              storageRef,
+              val.profile_image
+            );
+            await uploadTask;
 
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+            formData.append("profile_image", downloadURL);
+          } catch (uploadError) {
+            console.error("Error uploading file:", uploadError);
+          }
+        }
         const response = await update({
           body: formData,
           token: user.token,
@@ -96,7 +106,7 @@ const UpdateAdminForm = () => {
           );
           toast.success("User details updated!");
         }
-
+        setIsLoading(false);
         setIsImage(false);
       } catch (err) {
         toast.error(err.data);

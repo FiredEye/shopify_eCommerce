@@ -21,16 +21,16 @@ const loginSchema = Joi.object({
 });
 
 const userDetailSchema = Joi.object({
-  fullname: Joi.string().min(5).max(20).optional(),
+  fullname: Joi.string().min(5).max(20).required("username is required"),
   address: Joi.string().min(3).required("address is required"),
   city: Joi.string().min(5).max(25).required("city is required"),
   isEmpty: Joi.boolean(),
-  profile_image: Joi.string().required(),
+  profile_image: Joi.string().optional(),
 });
 const adminDetailSchema = Joi.object({
   fullname: Joi.string().min(5).max(20).required("Required"),
   email: Joi.string().email().required("mail is req"),
-  profile_image: Joi.string().required(),
+  profile_image: Joi.string().optional(),
 });
 // checkProfileFile,
 router.post(

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, Input, Button, Typography } from "@material-tailwind/react";
 import { useNavigate } from "react-router";
 import { useFormik } from "formik";
@@ -11,7 +11,8 @@ import { useRegisterUserMutation } from "../../features/authApi";
 import ContentWrapper from "../../components/ContentWrapper";
 
 const SignUp = () => {
-  const [userRegistration, { isLoading }] = useRegisterUserMutation();
+  const [isLoading, setIsLoading] = useState(false);
+  const [userRegistration] = useRegisterUserMutation();
   const registerSchema = Yup.object().shape({
     fullname: Yup.string().min(5).max(20).required("Required"),
     email: Yup.string().email("Invalid email").required("Required"),
@@ -42,24 +43,30 @@ const SignUp = () => {
     },
     onSubmit: async (val) => {
       try {
-        const fileName = uuidv4() + path.extname(val.profile_image.name);
+        setIsLoading(true);
+        const fileName = `${uuidv4()}.${val.profile_image.name
+          .split(".")
+          .pop()}`;
         const storageRef = ref(storage, "profiles/" + fileName);
 
         const uploadTask = uploadBytesResumable(storageRef, val.profile_image);
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        uploadTask.then(() => {
+          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+            let formData = new FormData();
+            formData.append("fullname", val.fullname);
+            formData.append("email", val.email);
+            formData.append("password", val.password);
+            formData.append("profile_image", downloadURL);
+            const response = await userRegistration(formData).unwrap();
 
-        let formData = new FormData();
-        formData.append("fullname", val.fullname);
-        formData.append("email", val.email);
-        formData.append("password", val.password);
-        formData.append("profile_image", downloadURL);
-
-        const response = await userRegistration(formData).unwrap();
-
-        toast.success("User registered sucessfully.");
-        formik.resetForm();
-        nav("/login");
+            setIsLoading(false);
+            toast.success("User registered sucessfully.");
+            formik.resetForm();
+            nav("/login");
+          });
+        });
       } catch (err) {
+        setIsLoading(false);
         toast.error(err.data);
       }
     },
